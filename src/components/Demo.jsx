@@ -8,14 +8,40 @@ function Demo() {
     summary: ''
   })
 
+  const [allArticles, setAllArticles] = useState([])
+  const [isCopied, setIsCopied] = useState(false)
+
   const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery()
+
+  useEffect(() => {
+    setAllArticles(JSON.parse(localStorage.getItem('articles')))
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     const { data } = await getSummary({ articleUrl: article.url })
+    const newArticle = { ...article, summary: data.summary }
+    const updatedArticlesList = [newArticle, ...allArticles]
 
-    setArticle({ ...article, summary: data.summary })
+    setArticle(newArticle)
+    setAllArticles(updatedArticlesList)
+
+    localStorage.setItem('articles', JSON.stringify(updatedArticlesList))
+  }
+
+  const handleCopy = (url) => {
+    setIsCopied(true)
+    navigator.clipboard.writeText(url)
+    setTimeout(() => setIsCopied(false), 1000)
+  }
+
+  const removeFromStorage = (index) => {
+    const removeEl = allArticles.filter((item, i) => i !== index)
+    // console.log(removeEl, allArticles);
+    
+    setAllArticles(removeEl)
+    localStorage.setItem('articles', JSON.stringify(removeEl))
   }
 
   return (
@@ -30,6 +56,21 @@ function Demo() {
         </form>
 
         {/* Browse URL History */}
+        <div className='flex flex-col gap-1 max-h-60'>
+          {allArticles.map((item, index) => (
+            <div key={index} className='link_card' onClick={() => setArticle(item)}>
+                <div className="copy_btn" onClick={() => handleCopy(item.url)}> 
+                  <img src={isCopied ? tick : copy} alt="copy" />
+                </div>
+
+                <p className='flex-1 font-satoshi text-blue-700 font-medium text-sm'>
+                  {item.url}
+                </p>
+ 
+                <i class="fa-regular fa-circle-xmark text-gray-400 text-[18px]" onClick={() => removeFromStorage(index)}></i>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Display Results */}
