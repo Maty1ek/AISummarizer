@@ -1,8 +1,5 @@
-# React + Vite
+# AI Summarizer of the articles based on ChatGPT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+On this simple application U can paste a link of an article, and the app will show you the summary of the article. The application is little bit out of time, because now it is built in function of ChatGPT. But this app is not using current abilities of ChatGPT, but instead, using another extra API to do so. That what makes this application special.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+It gave me a lot of knowledges and experience of working with API's
