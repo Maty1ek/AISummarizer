@@ -56,21 +56,24 @@ function Demo() {
         </form>
 
         {/* Browse URL History */}
-        <div className='flex flex-col gap-1 max-h-60'>
-          {allArticles.map((item, index) => (
-            <div key={index} className='link_card' onClick={() => setArticle(item)}>
-                <div className="copy_btn" onClick={() => handleCopy(item.url)}> 
+        {allArticles && (
+          <div className='flex flex-col gap-1 max-h-60'>
+            {allArticles.map((item, index) => (
+              <div key={index} className='link_card' onClick={() => setArticle(item)}>
+                <div className="copy_btn" onClick={() => handleCopy(item.url)}>
                   <img src={isCopied ? tick : copy} alt="copy" />
                 </div>
 
                 <p className='flex-1 font-satoshi text-blue-700 font-medium text-sm'>
                   {item.url}
                 </p>
- 
+
                 <i class="fa-regular fa-circle-xmark text-gray-400 text-[18px]" onClick={() => removeFromStorage(index)}></i>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
       </div>
 
       {/* Display Results */}
