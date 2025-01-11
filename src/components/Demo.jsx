@@ -9,39 +9,44 @@ function Demo() {
   })
 
   const [allArticles, setAllArticles] = useState([])
-  const [isCopied, setIsCopied] = useState(false)
+  const [copied, setCopied] = useState('')
 
   const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery()
 
   useEffect(() => {
-    setAllArticles(JSON.parse(localStorage.getItem('articles')))
+    const articlesFromLocalStorage = JSON.parse(
+      localStorage.getItem('articles')
+    )
+
+    if (articlesFromLocalStorage) {
+      setAllArticles(articlesFromLocalStorage)
+    }
   }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
     const { data } = await getSummary({ articleUrl: article.url })
-    const newArticle = { ...article, summary: data.summary }
-    const updatedArticlesList = [newArticle, ...allArticles]
 
-    setArticle(newArticle)
-    setAllArticles(updatedArticlesList)
+    if (data?.summary) {
+      const newArticle = { ...article, summary: data.summary }
+      const updatedAllArticles = [newArticle, ...allArticles]
 
-    localStorage.setItem('articles', JSON.stringify(updatedArticlesList))
+      setArticle(newArticle)
+      setAllArticles(updatedAllArticles)
+
+      localStorage.setItem('articles', JSON.stringify(updatedAllArticles))
+    }
   }
 
-  const handleCopy = (url) => {
-    setIsCopied(true)
-    navigator.clipboard.writeText(url)
-    setTimeout(() => setIsCopied(false), 1000)
+  const handleCopy = (copyUrl) => {
+    setCopied(copyUrl)
+    navigator.clipboard.writeText(copyUrl)
+    setTimeout(() => setCopied(false), 3000)
   }
 
-  const removeFromStorage = (index) => {
-    const removeEl = allArticles.filter((item, i) => i !== index)
-    // console.log(removeEl, allArticles);
-    
-    setAllArticles(removeEl)
-    localStorage.setItem('articles', JSON.stringify(removeEl))
+  const removeLocalStorage = (index) => {
+    setAllArticles(prev => [...prev.splice(index, 1)])
+    localStorage.setItem('articles', JSON.stringify(allArticles))
   }
 
   return (
@@ -56,45 +61,44 @@ function Demo() {
         </form>
 
         {/* Browse URL History */}
-        <div className='flex flex-col gap-1 max-h-60'>
+        <div className="flex flex-col gap-1 max-h-60">
           {allArticles.map((item, index) => (
-            <div key={index} className='link_card' onClick={() => setArticle(item)}>
-                <div className="copy_btn" onClick={() => handleCopy(item.url)}> 
-                  <img src={isCopied ? tick : copy} alt="copy" />
-                </div>
+            <div key={index} onClick={() => setArticle(item)} className='link_card'>
+              <div className="copy_btn" onClick={() => handleCopy(item.url)}>
+                <img src={copied === item.url ? tick : copy} alt="copy_icon" className='w-[40%] h-[40%] object-contain' />
+              </div>
 
-                <p className='flex-1 font-satoshi text-blue-700 font-medium text-sm'>
-                  {item.url}
-                </p>
- 
-                <i class="fa-regular fa-circle-xmark text-gray-400 text-[18px]" onClick={() => removeFromStorage(index)}></i>
+              <p className='flex-1 font-satoshi text-blue-700 font-medium text-sm truncate'>
+                {item.url}
+              </p>
+
+              <i class="fa-regular fa-circle-xmark text-gray-400 text-[18px]" onClick={() => removeLocalStorage(index)}></i>
             </div>
           ))}
         </div>
       </div>
 
       {/* Display Results */}
-      <div className="my-10 max-w-full flex justify-center items-center">
-        {
-          isFetching ? (
-            <img src={loader} alt="loader" className='w-20 h-20' />
-          ) : error ? (
-            <p className='font-inter font-bold  text-[18px]'>Well, that wasn't supposed to hapen... <br /> <span className='font-satoshi text-gray-600 font-normal'>{error.data.error}</span></p>
-          ) : (
-            article.summary && (
-              <div className='flex flex-col gap-3'>
-                <h2 className="font-satoshi font-bold text-gray-600 text-xl">
-                  Article <span className='blue_gradient'>Summary</span>
-                </h2>
-                <div className="summary_box">
-                  <p className='font-inter font-[500] text-gray-700'>
-                    {article.summary}
-                  </p>
-                </div>
+      <div className='my-10 max-w-full flex justify-center items-center'>
+        {isFetching ? (
+          <img src={loader} alt="loader" className='w-20 h-20' />
+        ) : error ? (
+          <p className='font-inter font-bold text-black text-center'>Well, that wasn't supposed to happen...
+            <br />
+            <span className='font-satoshi font-normal text-gray-700'>
+              {error?.data?.error}
+            </span>
+          </p>
+        ) : (
+          article.summary && (
+            <div className="flex flex-col gap-3">
+              <h2 className='font-satoshi font-bold text-gray-600 text-xl'>Article <span className='blue_gradient'>Summary</span></h2>
+              <div className="summary_box">
+                <p className='font-inter font-edium text-sm text-gray-700'>{article.summary}</p>
               </div>
-            )
+            </div>
           )
-        }
+        )}
       </div>
     </section>
   )
