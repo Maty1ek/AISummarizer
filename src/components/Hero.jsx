@@ -15,7 +15,9 @@ const Hero = () => {
         Summarize Articles with <br className='max-md:hidden'/> <span className='orange_gradient'>OpenAI GPT-4</span>
       </h1>
       <h2 className="desc">
-        Simplify your reading with Summize, an open-source article summarizer that transforms lengthy articles into clear and concise summaries
+        Enter a link to any article you want to summarize! The link must lead to an article, otherwise you will get an error.
+        <br />
+        Введите ссылку на любую статью, которую вы хотите кратко изложить! Ссылка должна вести на статью, иначе произойдёт ошибка.
       </h2>
     </header>
   )
